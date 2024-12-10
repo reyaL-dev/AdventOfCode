@@ -61,7 +61,7 @@ public class Day09PartOne
 
         public String toString()
         {
-            //            String s = id + ":" + len +"x" + space;
+            //           String s = id + ":" + len +"x" + space;
             String s = "";
             s += String.join("", Collections.nCopies(len, "[" + id + "]"));
             s += String.join("", Collections.nCopies(space, "."));
