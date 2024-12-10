@@ -17,9 +17,7 @@ public class Day06PartTwo
         origMap = makeUnmodifiable(origMap);
 
         List<int[]> positions = findDistinctPositions(origMap);
-
         System.out.println("Possible paradoxes : " + countParadoxPositions(origMap, positions));
-
     }
 
     // Helper function to preserve original map
@@ -44,15 +42,22 @@ public class Day06PartTwo
             List<List<Character>> tempMap = createModifiableCopy(origMap);
 
             tempMap.get(position[0]).set(position[1], 'O');
+            boolean isParadoxMap = checkParadoxMap(tempMap);
 
-            if (checkParadoxMap(tempMap))
+//            System.out.println("Current map: " + position[0] + " and " + position[1]);
+//            for (List<Character> charList : tempMap)
+//            {
+//                for (Character c : charList)
+//                {
+//                    int numericValue = (int) c;
+//                    System.out.printf("%02d" + ",", numericValue);
+//                }
+//                System.out.println();
+//            }
+
+            if (isParadoxMap)
             {
                 count++;
-                System.out.println("Current map: " + position[0] + " and " + position[1]);
-                for (List<Character> charList : tempMap)
-                {
-                    System.out.println(charList);
-                }
             }
 
         }
@@ -61,210 +66,140 @@ public class Day06PartTwo
 
     private static boolean checkParadoxMap(List<List<Character>> map)
     {
-        int[] currentPosition = findSymbolPosition(map, '^');
+        int[] lastPosition = findSymbolPosition(map, '^');
+        assert lastPosition != null;
+        map.get(lastPosition[0]).set(lastPosition[1], '.');
         int direction = 0;
-        int[] lastPlusUp = {0, 0};
-        int[] lastPlusLeft = {0, 0};
-        int[] lastPlusRight = {0, 0};
-        int[] lastPlusDown = {0, 0};
 
         while (true)
         {
-            int x = currentPosition[0];
-            int y = currentPosition[1];
+            int currentX, currentY;
+            char currentSymbol, lastSymbol;
             switch (direction)
             {
-                // Up
+                // Up --> 0b0001
                 case 0:
-                    x--;
-                    if (x < 0)
+                    currentX = lastPosition[0] - 1;
+                    currentY = lastPosition[1];
+                    if (currentX < 0)
                     {
                         return false;
                     }
-
+                    lastSymbol = map.get(lastPosition[0]).get(lastPosition[1]);
+                    currentSymbol = map.get(currentX).get(currentY);
+                    addTrailLastPosition(map, lastSymbol, lastPosition[0], lastPosition[1], (char) 0b0001);
                     // check if obstacle
-                    if ((map.get(x).get(y) == '#') || (map.get(x).get(y) == 'O'))
+                    if ((currentSymbol == '#') || (currentSymbol == 'O'))
                     {
-                        //Check for Paradox
-                        if (map.get(currentPosition[0]).get(y + 1) == '-' || map.get(currentPosition[0]).get(y + 1) == '+')
-                        {
-                            //                            System.out.println("Found Paradox upwards!");
-                            return true;
-                        }
-                        if (map.get(currentPosition[0]).get(y + 1) == '#' || map.get(currentPosition[0]).get(y + 1) == 'O')
-                        {
-                            direction++;
-                        }
-                        //                        System.out.println("Up Putting in + on " + currentPosition[0] + " and " + y);
-                        if ((lastPlusUp[0] == currentPosition[0]) && (lastPlusUp[1] == y))
-                        {
-                            //                            System.out.println("Found Paradox up to down !");
-                            return true;
-                        }
-                        lastPlusUp[0] = currentPosition[0];
-                        lastPlusUp[1] = y;
-                        map.get(currentPosition[0]).set(y, '+');
                         direction++;
                         break;
                     } else
                     {
-                        if (map.get(currentPosition[0]).get(y) == '-' || map.get(currentPosition[0]).get(y) == '+')
+                        //Check for Paradox
+                        if (((currentSymbol & 0b0001) == 0b0001) && (currentSymbol != '.'))
                         {
-                            map.get(currentPosition[0]).set(y, '+');
-                        } else
-                        {
-                            map.get(currentPosition[0]).set(y, '|');
+                            return true;
                         }
-                        currentPosition[0] = x;
+                        lastPosition[0] = currentX;
                         break;
                     }
-
-                    // Right
+                    // Right --> 0b0010
                 case 1:
-                    y++;
-
-                    // If out of map
-                    if (y >= map.get(0).size())
+                    currentX = lastPosition[0];
+                    currentY = lastPosition[1] + 1;
+                    if (currentY >= map.get(0).size())
                     {
                         return false;
                     }
-
-
+                    lastSymbol = map.get(lastPosition[0]).get(lastPosition[1]);
+                    currentSymbol = map.get(currentX).get(currentY);
+                    addTrailLastPosition(map, lastSymbol, lastPosition[0], lastPosition[1], (char) 0b0010);
                     // check if obstacle
-                    if ((map.get(x).get(y) == '#') || (map.get(x).get(y) == 'O'))
+                    if ((currentSymbol == '#') || (currentSymbol == 'O'))
                     {
-                        //Check for Paradox
-                        if (map.get(x + 1).get(currentPosition[1]) == '|' || map.get(x + 1).get(currentPosition[1]) == '+')
-                        {
-                            //                            System.out.println("Found Paradox right!");
-                            return true;
-                        }
-                        if (map.get(x + 1).get(currentPosition[1]) == '#' || map.get(x + 1).get(currentPosition[1]) == 'O')
-                        {
-                            direction++;
-                        }
-                        //                        System.out.println("Right Putting in + on " + x + " and " + currentPosition[1]);
-                        if ((lastPlusRight[0] == x) && (lastPlusRight[1] == currentPosition[1]))
-                        {
-                            //                            System.out.println("Found Paradox right to left !");
-                            return true;
-                        }
-                        lastPlusRight[0] = x;
-                        lastPlusRight[1] = currentPosition[1];
-                        map.get(x).set(currentPosition[1], '+');
                         direction++;
                         break;
                     } else
                     {
-                        if (map.get(x).get(currentPosition[1]) == '|' || map.get(x).get(currentPosition[1]) == '+')
+                        //Check for Paradox
+                        if (((currentSymbol & 0b0010) == 0b0010) && (currentSymbol != '.'))
                         {
-                            map.get(x).set(currentPosition[1], '+');
-                        } else
-                        {
-                            map.get(x).set(currentPosition[1], '-');
+                            return true;
                         }
-                        currentPosition[1] = y;
+                        lastPosition[1] = currentY;
                         break;
                     }
 
                     // Down
                 case 2:
-                    x++;
+                    currentX = lastPosition[0] + 1;
+                    currentY = lastPosition[1];
                     // If out of map
-                    if (x >= map.size())
+                    if (currentX >= map.size())
                     {
                         return false;
                     }
-
+                    lastSymbol = map.get(lastPosition[0]).get(lastPosition[1]);
+                    currentSymbol = map.get(currentX).get(currentY);
+                    addTrailLastPosition(map, lastSymbol, lastPosition[0], lastPosition[1], (char) 0b0100);
                     // check if obstacle
-                    if ((map.get(x).get(y) == '#') || (map.get(x).get(y) == 'O'))
+                    if ((currentSymbol == '#') || (currentSymbol == 'O'))
                     {
-                        //Check for Paradox
-                        if (map.get(currentPosition[0]).get(y - 1) == '-' || map.get(currentPosition[0]).get(y - 1) == '+')
-                        {
-                            //                            System.out.println("Found Paradox downwards!");
-                            return true;
-                        }
-                        if (map.get(currentPosition[0]).get(y - 1) == '#' || map.get(currentPosition[0]).get(y - 1) == 'O')
-                        {
-                            direction = -1;
-                        }
-                        //                        System.out.println("Down Putting in + on " + currentPosition[0] + " and " + y);
-                        if ((lastPlusDown[0] == currentPosition[0]) && (lastPlusDown[1] == y))
-                        {
-                            //                            System.out.println("Found Paradox up to down !");
-                            return true;
-                        }
-                        lastPlusDown[0] = currentPosition[0];
-                        lastPlusDown[1] = y;
-                        map.get(currentPosition[0]).set(y, '+');
                         direction++;
                         break;
                     } else
                     {
-                        if (map.get(currentPosition[0]).get(y) == '-' || map.get(currentPosition[0]).get(y) == '+')
+                        //Check for Paradox
+                        if (((currentSymbol & 0b0100) == 0b0100) && (currentSymbol != '.'))
                         {
-                            map.get(currentPosition[0]).set(y, '+');
-                        } else
-                        {
-                            map.get(currentPosition[0]).set(y, '|');
+                            return true;
                         }
-                        currentPosition[0] = x;
+                        lastPosition[0] = currentX;
                         break;
                     }
 
                     // Left
                 case 3:
-                    y--;
+                    currentX = lastPosition[0];
+                    currentY = lastPosition[1] - 1;
                     // If out of map
-                    if (y < 0)
+                    if (currentY < 0)
                     {
                         return false;
                     }
-
+                    lastSymbol = map.get(lastPosition[0]).get(lastPosition[1]);
+                    currentSymbol = map.get(currentX).get(currentY);
+                    addTrailLastPosition(map, lastSymbol, lastPosition[0], lastPosition[1], (char) 0b1000);
                     // check if obstacle
-                    if ((map.get(x).get(y) == '#') || (map.get(x).get(y) == 'O'))
+                    if ((currentSymbol == '#') || (currentSymbol == 'O'))
                     {
-                        //Check for Paradox
-                        if (map.get(x - 1).get(currentPosition[1]) == '-' || map.get(x - 1).get(currentPosition[1]) == '+')
-                        {
-                            //                            System.out.println("Found Paradox left!");
-                            return true;
-                        }
-                        if (map.get(x - 1).get(currentPosition[1]) == '#' || map.get(x - 1).get(currentPosition[1]) == 'O')
-                        {
-                            direction = 1;
-                        } else
-                        {
-                            direction = 0;
-                        }
-                        //                        System.out.println("Left Putting in + on " + x + " and " + currentPosition[1]);
-                        if ((lastPlusLeft[0] == x) && (lastPlusLeft[1] == currentPosition[1]))
-                        {
-                            //                            System.out.println("Found Paradox left to right !");
-                            return true;
-                        }
-                        lastPlusLeft[0] = x;
-                        lastPlusLeft[1] = currentPosition[1];
-                        map.get(x).set(currentPosition[1], '+');
-
+                        direction = 0;
                         break;
                     } else
                     {
-                        if (map.get(x).get(currentPosition[1]) == '|' || map.get(x).get(currentPosition[1]) == '+')
+                        //Check for Paradox
+                        if (((currentSymbol & 0b1000) == 0b1000) && (currentSymbol != '.'))
                         {
-                            map.get(x).set(currentPosition[1], '+');
-                        } else
-                        {
-                            map.get(x).set(currentPosition[1], '-');
+                            return true;
                         }
-                        currentPosition[1] = y;
+                        lastPosition[1] = currentY;
                         break;
                     }
                 default:
                     System.out.println("ERROR!");
                     break;
             }
+        }
+    }
+
+    private static void addTrailLastPosition(List<List<Character>> map, char lastSymbol, int currentX, int currentY, char pos)
+    {
+        if (lastSymbol == '.')
+        {
+            map.get(currentX).set(currentY, pos);
+        } else
+        {
+            map.get(currentX).set(currentY, (char) (lastSymbol | pos));
         }
     }
 
@@ -325,6 +260,7 @@ public class Day06PartTwo
         List<List<Character>> map = createModifiableCopy(origMap);
 
         int[] currentPosition = findSymbolPosition(map, '^');
+        assert currentPosition != null;
         int startX = currentPosition[0];
         int startY = currentPosition[1];
         int direction = 0;
