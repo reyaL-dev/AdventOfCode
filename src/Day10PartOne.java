@@ -3,17 +3,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Day10PartOne
 {
 
     public static void main(String[] args) throws IOException
     {
-        File inputFile = new File("C:\\Project\\inputfiles\\input10TEST");
+        File inputFile = new File("C:\\Project\\inputfiles\\input10");
         int trailheadScore = 0;
 
         List<List<Integer>> origMap = loadMapFromFile(inputFile);
+
         // Iterate over all trailheads
         for (int i = 0; i < origMap.size(); i++)
         {
@@ -23,43 +26,74 @@ public class Day10PartOne
                 if (innerList.get(j) == 0)
                 {
                     System.out.println("Checking list: " + i + " and " + j);
-                    trailheadScore += getTrailheadScore(origMap, i, j);
+                    trailheadScore += getTrailheadScore(origMap, new Coords(i, j));
                 }
             }
         }
+
+
+        //        trailheadScore += getTrailheadScore(origMap, new Coords(0, 2));
         System.out.println("trailheadScore: " + trailheadScore);
     }
 
-    private static int getTrailheadScore(List<List<Integer>> origMap, int i, int j)
+    private static int getTrailheadScore(List<List<Integer>> origMap, Coords pos)
     {
-        int numPathes = findValidPath(origMap, i, j, 0);
+        int numPathes = findValidPath(origMap, pos, 0, new HashSet<>());
         System.out.println("Score for this path: " + numPathes);
         return numPathes;
     }
 
-    private static int findValidPath(List<List<Integer>> origMap, int i, int j, int currentLevel)
+    private static int findValidPath(List<List<Integer>> origMap, Coords currentPos, int currentLevel, Set<Coords> visitedPos)
     {
-        System.out.println("Checking out: i=" + i + " j=" + j + " level:" + currentLevel);
-        if ((i < 0) || (j < 0) || (i >= origMap.size()) || (j >= origMap.get(0).size()))
-        {
-            return 0;
-        }
-        System.out.println("Current value: " + origMap.get(i).get(j));
-        if (origMap.get(i).get(j) != (currentLevel))
-        {
-            return 0;
-        }
+        System.out.println("Checking out: x=" + currentPos.x + " y=" + currentPos.y + " level:" + currentLevel);
+        visitedPos.add(currentPos);
         if (currentLevel == 9)
         {
             System.out.println("Found path!");
             return 1;
         }
         int validPathes = 0;
-        validPathes += findValidPath(origMap, i + 1, j, currentLevel + 1);
-        validPathes += findValidPath(origMap, i, j + 1, currentLevel + 1);
-        validPathes += findValidPath(origMap, i - 1, j, currentLevel + 1);
-        validPathes += findValidPath(origMap, i, j - 1, currentLevel + 1);
+
+        Coords nextPos;
+
+        nextPos = new Coords(currentPos.x + 1, currentPos.y);
+        if (isInBounds(origMap, nextPos))
+        {
+            if ((!visitedPos.contains(nextPos)) && (origMap.get(nextPos.x).get(nextPos.y) == currentLevel + 1))
+            {
+                validPathes += findValidPath(origMap, nextPos, currentLevel + 1, visitedPos);
+            }
+        }
+        nextPos = new Coords(currentPos.x, currentPos.y + 1);
+        if (isInBounds(origMap, nextPos))
+        {
+            if ((!visitedPos.contains(nextPos)) && (origMap.get(nextPos.x).get(nextPos.y) == currentLevel + 1))
+            {
+                validPathes += findValidPath(origMap, nextPos, currentLevel + 1, visitedPos);
+            }
+        }
+        nextPos = new Coords(currentPos.x - 1, currentPos.y);
+        if (isInBounds(origMap, nextPos))
+        {
+            if ((!visitedPos.contains(nextPos)) && (origMap.get(nextPos.x).get(nextPos.y) == currentLevel + 1))
+            {
+                validPathes += findValidPath(origMap, nextPos, currentLevel + 1, visitedPos);
+            }
+        }
+        nextPos = new Coords(currentPos.x, currentPos.y - 1);
+        if (isInBounds(origMap, nextPos))
+        {
+            if ((!visitedPos.contains(nextPos)) && (origMap.get(nextPos.x).get(nextPos.y) == currentLevel + 1))
+            {
+                validPathes += findValidPath(origMap, nextPos, currentLevel + 1, visitedPos);
+            }
+        }
         return validPathes;
+    }
+
+    private static Boolean isInBounds(List<List<Integer>> origMap, Coords currentPos)
+    {
+        return ((currentPos.x >= 0) && (currentPos.y >= 0) && (currentPos.x < origMap.size()) && (currentPos.y < origMap.get(0).size()));
     }
 
     private static List<List<Integer>> loadMapFromFile(File inputFile) throws IOException
@@ -89,5 +123,10 @@ public class Day10PartOne
             map.add(intList);
         }
         return map;
+    }
+
+    record Coords(int x, int y)
+    {
+
     }
 }
