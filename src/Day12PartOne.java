@@ -15,11 +15,6 @@ public class Day12PartOne
         File inputFile = new File("C:\\Project\\inputfiles\\input12");
         List<List<Character>> origMap = loadMapFromFile(inputFile);
         System.out.println("Total Price of regions: " + getTotalPrice(origMap));
-        //        for (List<Character> charList : origMap)
-        //        {
-        //            System.out.println(charList);
-        //        }
-
     }
 
     private static int getTotalPrice(List<List<Character>> origMap)
