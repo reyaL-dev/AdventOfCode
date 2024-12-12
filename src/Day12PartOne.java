@@ -34,7 +34,7 @@ public class Day12PartOne
                 if (!visitedPos.contains(currentPos))
                 {
                     char plantType = origMap.get(currentPos.x).get(currentPos.y);
-                    System.out.println("A region of "+plantType+" plants with price:" + getRegionPrice(origMap, currentPos, visitedPos, plantType));
+                    System.out.println("A region of " + plantType + " plants with price:" + getRegionPrice(origMap, currentPos, visitedPos, plantType));
                 }
             }
         }
@@ -84,7 +84,7 @@ public class Day12PartOne
                 totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
             }
         }
-        totalPrice+=AreaPrice;
+        totalPrice += AreaPrice;
         return totalPrice;
     }
 
