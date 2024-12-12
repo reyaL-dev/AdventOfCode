@@ -12,7 +12,7 @@ public class Day12PartOne
 
     public static void main(String[] args) throws IOException
     {
-        File inputFile = new File("C:\\Project\\inputfiles\\input12TEST");
+        File inputFile = new File("C:\\Project\\inputfiles\\input12");
         List<List<Character>> origMap = loadMapFromFile(inputFile);
         System.out.println("Total Price of regions: " + getTotalPrice(origMap));
         //        for (List<Character> charList : origMap)
@@ -22,9 +22,10 @@ public class Day12PartOne
 
     }
 
-    private static String getTotalPrice(List<List<Character>> origMap)
+    private static int getTotalPrice(List<List<Character>> origMap)
     {
         Set<Coords> visitedPos = new HashSet<>();
+        int totalPrice = 0;
         for (int i = 0; i < origMap.size(); i++)
         {
             List<Character> innerList = origMap.get(i);
@@ -34,11 +35,15 @@ public class Day12PartOne
                 if (!visitedPos.contains(currentPos))
                 {
                     char plantType = origMap.get(currentPos.x).get(currentPos.y);
-                    System.out.println("A region of " + plantType + " plants with price:" + getRegionPrice(origMap, currentPos, visitedPos, plantType));
+                    Set<Coords> trackedPos = new HashSet<>();
+                    int regionPrice = getRegionPrice(origMap, currentPos, trackedPos, plantType) * trackedPos.size();
+                    System.out.println("A region of " + plantType + " plants with price:" + regionPrice);
+                    visitedPos.addAll(trackedPos);
+                    totalPrice+=regionPrice;
                 }
             }
         }
-        return null;
+        return totalPrice;
     }
 
     private static int getRegionPrice(List<List<Character>> origMap, Coords currentPos, Set<Coords> visitedPos, char cropId)
@@ -51,37 +56,61 @@ public class Day12PartOne
         nextPos = new Coords(currentPos.x + 1, currentPos.y);
         if (isInBounds(origMap, nextPos))
         {
-            if ((!visitedPos.contains(nextPos)) && (origMap.get(nextPos.x).get(nextPos.y) == cropId))
+            if (!visitedPos.contains(nextPos))
+            {
+                if (origMap.get(nextPos.x).get(nextPos.y) == cropId)
+                {
+                    AreaPrice--;
+                    totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
+                }
+            } else
             {
                 AreaPrice--;
-                totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
             }
         }
         nextPos = new Coords(currentPos.x, currentPos.y + 1);
-        if (isInBounds(origMap, nextPos))
+        if (isInBounds(origMap, nextPos)) if (isInBounds(origMap, nextPos))
         {
-            if ((!visitedPos.contains(nextPos)) && (origMap.get(nextPos.x).get(nextPos.y) == cropId))
+            if (!visitedPos.contains(nextPos))
+            {
+                if (origMap.get(nextPos.x).get(nextPos.y) == cropId)
+                {
+                    AreaPrice--;
+                    totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
+                }
+            } else
             {
                 AreaPrice--;
-                totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
             }
         }
         nextPos = new Coords(currentPos.x - 1, currentPos.y);
         if (isInBounds(origMap, nextPos))
         {
-            if ((!visitedPos.contains(nextPos)) && (origMap.get(nextPos.x).get(nextPos.y) == cropId))
+            if (!visitedPos.contains(nextPos))
+            {
+                if (origMap.get(nextPos.x).get(nextPos.y) == cropId)
+                {
+                    AreaPrice--;
+                    totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
+                }
+            } else
             {
                 AreaPrice--;
-                totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
             }
         }
         nextPos = new Coords(currentPos.x, currentPos.y - 1);
         if (isInBounds(origMap, nextPos))
         {
-            if ((!visitedPos.contains(nextPos)) && (origMap.get(nextPos.x).get(nextPos.y) == cropId))
+            if (!visitedPos.contains(nextPos))
+            {
+                if (origMap.get(nextPos.x).get(nextPos.y) == cropId)
+                {
+                    AreaPrice--;
+                    totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
+                }
+            } else
             {
                 AreaPrice--;
-                totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
             }
         }
         totalPrice += AreaPrice;
