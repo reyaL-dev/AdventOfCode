@@ -11,7 +11,7 @@ public class Day12PartTwo
 
     public static void main(String[] args) throws IOException
     {
-        File inputFile = new File("C:\\Project\\inputfiles\\input12TEST");
+        File inputFile = new File("C:\\Project\\inputfiles\\input12");
         List<List<Character>> origMap = loadMapFromFile(inputFile);
         System.out.println("Total Price of regions: " + getTotalPrice(origMap));
     }
@@ -29,123 +29,87 @@ public class Day12PartTwo
                 if (!visitedPos.contains(currentPos))
                 {
                     char plantType = getCharacter(origMap, currentPos);
-                    Set<Coords> trackedPos = new HashSet<>();
-                    if (plantType == 'R')
-                    {
-                        int regionPrice = getRegionPrice(origMap, currentPos, trackedPos, plantType); // trackedPos.size();
-                        System.out.println("A region of " + plantType + " and number: " + trackedPos.size() + " plants with price:" + regionPrice);
-                        visitedPos.addAll(trackedPos);
-                        totalPrice += regionPrice;
-                    }
+                    List<Coords> trackedPos = new ArrayList<>();
+                    getDistinctRegion(origMap, currentPos, trackedPos, plantType);
+                    int distinctWalls = getDistinctWalls(origMap, trackedPos, plantType);
+                    totalPrice+=trackedPos.size() * distinctWalls;
+                    visitedPos.addAll(trackedPos);
                 }
             }
         }
         return totalPrice;
     }
 
-    private static int getRegionPrice(List<List<Character>> origMap, Coords currentPos, Set<Coords> visitedPos, char cropId)
+    private static int getDistinctWalls(List<List<Character>> origMap, List<Coords> trackedPos, char cropId)
+    {
+        int wallCount = 0;
+        Coords lastCheck;
+        lastCheck = new Coords(-1, -1);
+        boolean lastWall = false;
+        trackedPos.sort(Comparator.comparingInt(Coords::x).thenComparingInt(Coords::y));
+        // Left Walls
+        for (Coords Coord : trackedPos)
+        {
+            boolean isWalled = (getShape(origMap, Coord, cropId) & LEFT) == LEFT;
+            if (isWalled)
+            {
+                if (!((Objects.equals(lastCheck, new Coords(Coord.x, Coord.y - 1))) && lastWall))
+                {
+                    wallCount++;
+                }
+            }
+            lastCheck = Coord;
+            lastWall = isWalled;
+        }
+        // Right Walls
+        for (Coords Coord : trackedPos)
+        {
+            boolean isWalled = (getShape(origMap, Coord, cropId) & RIGHT) == RIGHT;
+            if (isWalled)
+            {
+                if (!((Objects.equals(lastCheck, new Coords(Coord.x, Coord.y - 1))) && lastWall))
+                {
+                    wallCount++;
+                }
+            }
+            lastCheck = Coord;
+            lastWall = isWalled;
+        }
+        trackedPos.sort(Comparator.comparingInt(Coords::y).thenComparingInt(Coords::x));
+        // Left Walls
+        for (Coords Coord : trackedPos)
+        {
+            boolean isWalled = (getShape(origMap, Coord, cropId) & BOTTOM) == BOTTOM;
+            if (isWalled)
+            {
+                if (!((Objects.equals(lastCheck, new Coords(Coord.x - 1, Coord.y))) && lastWall))
+                {
+                    wallCount++;
+                }
+            }
+            lastCheck = Coord;
+            lastWall = isWalled;
+        }
+        // Top Walls
+        for (Coords Coord : trackedPos)
+        {
+            boolean isWalled = (getShape(origMap, Coord, cropId) & TOP) == TOP;
+            if (isWalled)
+            {
+                if (!((Objects.equals(lastCheck, new Coords(Coord.x - 1, Coord.y))) && lastWall))
+                {
+                    wallCount++;
+                }
+            }
+            lastCheck = Coord;
+            lastWall = isWalled;
+        }
+        return wallCount;
+    }
+
+    private static void getDistinctRegion(List<List<Character>> origMap, Coords currentPos, List<Coords> visitedPos, char cropId)
     {
         visitedPos.add(currentPos);
-
-        int ownShape = getShape(origMap, currentPos, cropId);
-        if (ownShape == 15)
-        {
-            return 4;
-        }
-        int totalPrice = 0, numCornor;
-        HashMap<Integer, Integer> neighborShapes = new HashMap<>();
-        neighborShapes.put(TOP, getShape(origMap, new Coords(currentPos.x, currentPos.y - 1), cropId));
-        neighborShapes.put(LEFT, getShape(origMap, new Coords(currentPos.x - 1, currentPos.y), cropId));
-        neighborShapes.put(RIGHT, getShape(origMap, new Coords(currentPos.x + 1, currentPos.y), cropId));
-        neighborShapes.put(BOTTOM, getShape(origMap, new Coords(currentPos.x, currentPos.y + 1), cropId));
-//        System.out.println("Neighbors on " + currentPos + " : " + neighborShapes);
-        switch (ownShape)
-        {
-            case 0, 6, 9:
-                numCornor = 0;
-                break;
-                // Single pieces
-            case 7, 11, 13, 14:
-                numCornor = 2;
-                break;
-            case 10:
-                numCornor = 2;
-                if (((neighborShapes.get(RIGHT) & TOP) != TOP) && ((neighborShapes.get(TOP) & RIGHT) != RIGHT))
-                {
-                    numCornor = 1;
-                }
-                break;
-            case 12:
-                numCornor = 2;
-                if (((neighborShapes.get(LEFT) & TOP) != TOP) && ((neighborShapes.get(TOP) & LEFT) != LEFT))
-                {
-                    numCornor = 1;
-                }
-                break;
-            case 3:
-                numCornor = 2;
-                if (((neighborShapes.get(RIGHT) & BOTTOM) != BOTTOM) && ((neighborShapes.get(BOTTOM) & RIGHT) != RIGHT))
-                {
-                    numCornor = 1;
-                }
-                break;
-            case 5:
-                numCornor = 2;
-                if (((neighborShapes.get(LEFT) & BOTTOM) != BOTTOM) && ((neighborShapes.get(TOP) & RIGHT) != RIGHT))
-                {
-                    numCornor = 1;
-                }
-                break;
-            case 1:
-                numCornor = 2;
-                if ((neighborShapes.get(LEFT) & BOTTOM) != BOTTOM)
-                {
-                    numCornor--;
-                }
-                if ((neighborShapes.get(RIGHT) & BOTTOM) != BOTTOM)
-                {
-                    numCornor--;
-                }
-                break;
-            case 2:
-                numCornor = 2;
-                if ((neighborShapes.get(TOP) & RIGHT) != RIGHT)
-                {
-                    numCornor--;
-                }
-                if ((neighborShapes.get(BOTTOM) & RIGHT) != RIGHT)
-                {
-                    numCornor--;
-                }
-                break;
-            case 4:
-                numCornor = 2;
-                if ((neighborShapes.get(TOP) & LEFT) != LEFT)
-                {
-                    numCornor--;
-                }
-                if ((neighborShapes.get(BOTTOM) & LEFT) != LEFT)
-                {
-                    numCornor--;
-                }
-                break;
-            case 8:
-                numCornor = 2;
-                if ((neighborShapes.get(LEFT) & TOP) != TOP)
-                {
-                    numCornor--;
-                }
-                if ((neighborShapes.get(RIGHT) & TOP) != TOP)
-                {
-                    numCornor--;
-                }
-                break;
-            default:
-                System.out.println("Invalid state");
-                numCornor = 0;
-                break;
-        }
-
         Coords nextPos;
 
         nextPos = new Coords(currentPos.x + 1, currentPos.y);
@@ -155,7 +119,7 @@ public class Day12PartTwo
             {
                 if (getCharacter(origMap, nextPos) == cropId)
                 {
-                    totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
+                    getDistinctRegion(origMap, nextPos, visitedPos, cropId);
                 }
             }
         }
@@ -166,7 +130,7 @@ public class Day12PartTwo
             {
                 if (getCharacter(origMap, nextPos) == cropId)
                 {
-                    totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
+                    getDistinctRegion(origMap, nextPos, visitedPos, cropId);
                 }
             }
         }
@@ -177,7 +141,7 @@ public class Day12PartTwo
             {
                 if (getCharacter(origMap, nextPos) == cropId)
                 {
-                    totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
+                    getDistinctRegion(origMap, nextPos, visitedPos, cropId);
                 }
             }
         }
@@ -188,13 +152,10 @@ public class Day12PartTwo
             {
                 if (getCharacter(origMap, nextPos) == cropId)
                 {
-                    totalPrice += getRegionPrice(origMap, nextPos, visitedPos, cropId);
+                    getDistinctRegion(origMap, nextPos, visitedPos, cropId);
                 }
             }
         }
-        System.out.println("Cornors on : " + currentPos + " : " + numCornor + " and shape: " + ownShape);
-        totalPrice += numCornor;
-        return totalPrice;
     }
 
     private static Character getCharacter(List<List<Character>> origMap, Coords nextPos)
