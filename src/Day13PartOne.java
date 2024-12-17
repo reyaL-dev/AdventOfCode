@@ -82,7 +82,7 @@ public class Day13PartOne
     {
         BigInteger button1X = V1[0], button1Y = V1[1];
         BigInteger button2X = V2[0], button2Y = V2[1];
-        BigInteger targetX = V3[0], V3_y = V3[1];
+        BigInteger targetX = V3[0], targetY = V3[1];
 
         BigInteger determinant = button1X.multiply(button2Y).subtract(button1Y.multiply(button2X));
 
@@ -91,8 +91,8 @@ public class Day13PartOne
             return null;
         }
 
-        BigInteger nNumerator = targetX.multiply(button2Y).subtract(V3_y.multiply(button2X));
-        BigInteger mNumerator = button1X.multiply(V3_y).subtract(button1Y.multiply(targetX));
+        BigInteger nNumerator = targetX.multiply(button2Y).subtract(targetY.multiply(button2X));
+        BigInteger mNumerator = targetY.multiply(button1X).subtract(targetX.multiply(button1Y));
 
         if (!nNumerator.remainder(determinant).equals(BigInteger.ZERO) || !mNumerator.remainder(determinant).equals(BigInteger.ZERO))
         {
