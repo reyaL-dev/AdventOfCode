@@ -224,8 +224,8 @@ public class Day15PartTwo
         } else
         {
             Coords nextRightWallPos = new Coords(objectPos.x + 1, nextMovement);
-            char nextTopRightSymbol = getCharFromPos(map, nextRightWallPos);
-            if ((nextSymbol == '#') || (nextTopRightSymbol == '#'))
+            char nextRightWallSymbol = getCharFromPos(map, nextRightWallPos);
+            if ((nextSymbol == '#') || (nextRightWallSymbol == '#'))
             {
                 return 0;
             }
@@ -234,7 +234,7 @@ public class Day15PartTwo
                 consideredNodes.add(nextPos);
                 movingObjects.add(nextPos);
             }
-            if (nextTopRightSymbol == '[')
+            if (nextRightWallSymbol == '[')
             {
                 consideredNodes.add(nextRightWallPos);
                 movingObjects.add(nextRightWallPos);
