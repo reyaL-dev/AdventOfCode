@@ -13,18 +13,16 @@ public class Day15PartTwo
 
     public static void main(String[] args) throws IOException
     {
-        File inputFile = new File("C:\\Project\\inputfiles\\input15TEST3");
-//        File inputFile = new File("C:\\Project\\inputfiles\\input15");
+        File inputFile = new File("C:\\Project\\inputfiles\\input15");
 
         List<List<Character>> map = new ArrayList<>();
         List<Byte> directions = new ArrayList<>();
         Coords lanternfishPos = readFile(inputFile, map, directions);
-        System.out.println("Fish at: " + lanternfishPos);
 
         for (byte direction : directions)
         {
             lanternfishPos = moveLanternfish(map, lanternfishPos, direction);
-            printMap(map);
+//            printMap(map);
         }
 
         printMap(map);
@@ -49,7 +47,6 @@ public class Day15PartTwo
         List<Coords> movingObjects = new ArrayList<>();
         movingObjects.add(lanternfishPos);
         int distanceMovedObjects = findValidDistance(map, movingObjects, direction);
-        System.out.println("Distance: " + distanceMovedObjects);
         Collections.reverse(movingObjects);
         if (distanceMovedObjects > 0)
         {
@@ -137,6 +134,7 @@ public class Day15PartTwo
     {
         int distance = 1;
         List<Coords> checkNodes = new ArrayList<>(movingObjects);
+        System.out.println("Checking Current Fish: " + movingObjects);
         while (true)
         {
             List<Coords> nextNodes = new ArrayList<>();
@@ -149,11 +147,6 @@ public class Day15PartTwo
                         int nextMovement = objectPos.y - 1;
                         Integer collision = getCollision(map, movingObjects, objectPos, nextMovement, nextNodes);
                         if (collision != null) return collision;
-                        if (nextNodes.isEmpty())
-                        {
-                            return distance;
-                        }
-                        checkNodes = nextNodes;
                         break;
                     }
                     case BOTTOM:
@@ -161,11 +154,6 @@ public class Day15PartTwo
                         int nextMovement = objectPos.y + 1;
                         Integer collision = getCollision(map, movingObjects, objectPos, nextMovement, nextNodes);
                         if (collision != null) return collision;
-                        if (nextNodes.isEmpty())
-                        {
-                            return distance;
-                        }
-                        checkNodes = nextNodes;
                         break;
                     }
                     case LEFT:
@@ -190,9 +178,18 @@ public class Day15PartTwo
                         break;
                     default:
                         throw new IllegalArgumentException("Invalid direction!");
+
                 }
             }
             distance++;
+            if (direction == TOP || direction == BOTTOM)
+            {
+                if (nextNodes.isEmpty())
+                {
+                    return distance;
+                }
+                checkNodes = nextNodes;
+            }
         }
     }
 
