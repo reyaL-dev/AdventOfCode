@@ -14,7 +14,7 @@ public class Day14PartOne
 
     public static void main(String[] args) throws IOException
     {
-        File inputFile = new File("C:\\Project\\inputfiles\\input14"); // Replace with your file path
+        File inputFile = new File("C:\\Project\\inputfiles\\input14");
         List<RobotInputs> robotInputs = readRobotInputs(inputFile);
         int[] tileset = {101, 103};
         int steps = 100;
