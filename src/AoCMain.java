@@ -3,8 +3,8 @@ public class AoCMain
 
     public static void main(String[] args) throws Exception
     {
-        Day18PartTwo DayHandler = new Day18PartTwo();
-        System.out.println(DayHandler.getSolutionString("C:\\Project\\inputfiles\\input18"));
+        Day19PartOne DayHandler = new Day19PartOne();
+        System.out.println(DayHandler.getSolutionString("C:\\Project\\inputfiles\\input19"));
     }
 
     // INTERFACES
