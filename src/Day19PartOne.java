@@ -64,7 +64,7 @@ public class Day19PartOne implements AoCMain.AoCHandler
         return false; // No valid combination found at this branch
     }
 
-    public <T> Object read(String path) throws IOException
+    public Object read(String path) throws IOException
     {
         List<String> availablePatterns = new ArrayList<>();
         List<String> desiredDesigns = new ArrayList<>();
