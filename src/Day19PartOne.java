@@ -8,6 +8,8 @@ import java.util.List;
 public class Day19PartOne implements AoCMain.AoCHandler
 {
 
+
+    // Unfit for larger Strings
     private static void findCombinationsHelper(List<String> availablePatterns, String target, int index,
                                                List<String> currentCombination, List<List<String>> result)
     {
@@ -26,6 +28,40 @@ public class Day19PartOne implements AoCMain.AoCHandler
                 currentCombination.remove(currentCombination.size() - 1);
             }
         }
+    }
+
+    public static List<String> findFirstCombination(List<String> availablePatterns, String design)
+    {
+        List<String> result = new ArrayList<>();
+        if (findFirstCombinationHelper(availablePatterns, design, 0, result))
+        {
+            return result;
+        }
+        return null;
+    }
+
+    private static boolean findFirstCombinationHelper(List<String> availablePatterns, String design, int index, List<String> result)
+    {
+        if (index == design.length())
+        {
+            return true;
+        }
+
+        for (String s : availablePatterns)
+        {
+            if (design.startsWith(s, index))
+            {
+                // If the string `s` can fit at the current index, use it
+                result.add(s);
+                if (findFirstCombinationHelper(availablePatterns, design, index + s.length(), result))
+                {
+                    return true; // Stop further searching once a valid combination is found
+                }
+                // Backtrack
+                result.remove(result.size() - 1);
+            }
+        }
+        return false; // No valid combination found at this branch
     }
 
     public <T> Object read(String path) throws IOException
@@ -63,7 +99,7 @@ public class Day19PartOne implements AoCMain.AoCHandler
         System.out.println(input.toString());
         for (String design : input.desiredDesigns)
         {
-            List<List<String>> combinations = findCombinations(input.availablePatterns, design);
+            /*List<List<String>> combinations = findCombinations(input.availablePatterns, design);
 
             if (!combinations.isEmpty())
             {
@@ -72,6 +108,15 @@ public class Day19PartOne implements AoCMain.AoCHandler
                 {
                     System.out.println(combination);
                 }
+                validDesigns++;
+            }*/
+
+            List<String> combination = findFirstCombination(input.availablePatterns, design);
+
+            if (!(combination == null || combination.isEmpty()))
+            {
+                System.out.println("Found Patterns for design: " + design);
+                System.out.println(combination);
                 validDesigns++;
             }
 
