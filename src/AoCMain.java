@@ -3,14 +3,14 @@ public class AoCMain
 
     public static void main(String[] args) throws Exception
     {
-        Day19PartTwo DayHandler = new Day19PartTwo();
-        System.out.println(DayHandler.getSolutionString("C:\\Project\\inputfiles\\input19"));
+        Day20PartOne DayHandler = new Day20PartOne("C:\\Project\\inputfiles\\input20");
+        System.out.println(DayHandler.getSolutionString(""));
     }
 
     // INTERFACES
     interface AoCHandler
     {
         Object read(String path) throws Exception;
-        String getSolutionString(String path) throws Exception;
+        String getSolutionString(String param) throws Exception;
     }
 }

@@ -92,10 +92,10 @@ public class Day19PartOne implements AoCMain.AoCHandler
     }
 
     @Override
-    public String getSolutionString(String path) throws Exception
+    public String getSolutionString(String param) throws Exception
     {
         int validDesigns = 0;
-        ParsedFile input = (ParsedFile) read(path);
+        ParsedFile input = (ParsedFile) read(param);
         System.out.println(input.toString());
         for (String design : input.desiredDesigns)
         {
