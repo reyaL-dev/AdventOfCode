@@ -40,6 +40,46 @@ class Day20PartTwo implements AoCMain.AoCHandler
         return coord.x >= 0 && coord.x < this.fileInput.map[0].length && coord.y >= 0 && coord.y < this.fileInput.map.length;
     }
 
+    private Map<Integer, List<Coords>> findValidShortcutsInRadius(Coords pos, List<Coords> remainingPath, int radius, int minDistance)
+    {
+        Map<Integer, List<Coords>> validCoords = new HashMap<>();
+        Set<Coords> radialCoords = new HashSet<>();
+
+        // Use taxicab radius
+        for (int i = 0; i <= radius; i++)
+        {
+            for (int j = 0; j <= radius; j++)
+            {
+                if ((i + j) <= radius && (i + j > 1))
+                {
+                    radialCoords.add(new Coords(i, j));
+                    radialCoords.add(new Coords(-i, j));
+                    radialCoords.add(new Coords(i, -j));
+                    radialCoords.add(new Coords(-i, -j));
+                }
+            }
+        }
+
+        for (Coords radialCoord : radialCoords)
+        {
+            Coords checkCoord = new Coords(radialCoord.x() + pos.x(), radialCoord.y() + pos.y());
+            if (!isValidCoord(checkCoord))
+                continue;
+
+            // Skip if minimum distance can't be reached or not a valid Coord
+            int shortcutLength = remainingPath.indexOf(checkCoord) + 1;
+            if (shortcutLength == 0)
+                continue;
+
+            int cheatDistance = Math.abs(radialCoord.x) + Math.abs(radialCoord.y);
+            if (minDistance <= shortcutLength - cheatDistance)
+            {
+                validCoords.computeIfAbsent(shortcutLength - cheatDistance, k -> new ArrayList<>()).add(checkCoord);
+            }
+        }
+        return validCoords;
+    }
+
     private List<Coords> findShortestPath(char[][] map, Coords start, Coords end)
     {
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingInt(Node::getfCost));
@@ -138,14 +178,14 @@ class Day20PartTwo implements AoCMain.AoCHandler
         // Return the path
         if (!foundPath.isEmpty())
         {
-            System.out.println("Shortest Path with " + (foundPath.size() - 1) + " steps:");
             TreeMap<Integer, List<Coords>> shortCuts = findShortCuts(foundPath);
             int numValidCheats = 0;
-            for (Map.Entry<Integer, List<Coords>> entry : shortCuts.tailMap(100).entrySet())
+            for (Map.Entry<Integer, List<Coords>> entry : shortCuts.entrySet())
             {
+                System.out.println("There are " + entry.getValue().size() + " cheats that save " + entry.getKey() + " picoseconds.");
                 numValidCheats += entry.getValue().size();
             }
-            System.out.println(numValidCheats);
+            return "Number of valid cheats: " + numValidCheats;
         }
 
         return "No Path Found!";
@@ -154,26 +194,14 @@ class Day20PartTwo implements AoCMain.AoCHandler
     private TreeMap<Integer, List<Coords>> findShortCuts(List<Coords> foundPath)
     {
         TreeMap<Integer, List<Coords>> shortcutMap = new TreeMap<>();
+
         for (int i = 0; i < foundPath.size(); i++)
         {
-            for (int direction = 0; direction <= 3; direction++)
+            Map<Integer, List<Coords>> shortCutPositions = findValidShortcutsInRadius(foundPath.get(i), foundPath.subList(i + 1, foundPath.size()), 20, 100);
+
+            for (Map.Entry<Integer, List<Coords>> entry : shortCutPositions.entrySet())
             {
-                Coords checkPos = switch (direction)
-                {
-                    case 0 -> new Coords(foundPath.get(i).x() + 2, foundPath.get(i).y());
-                    case 1 -> new Coords(foundPath.get(i).x() - 2, foundPath.get(i).y());
-                    case 2 -> new Coords(foundPath.get(i).x(), foundPath.get(i).y() + 2);
-                    case 3 -> new Coords(foundPath.get(i).x(), foundPath.get(i).y() - 2);
-                    default ->
-                    {
-                        yield null;
-                    }
-                };
-                int shortcutIndex = foundPath.subList(i, foundPath.size()).indexOf(checkPos);
-                if (shortcutIndex > 3)
-                {
-                    shortcutMap.computeIfAbsent(shortcutIndex - 2, k -> new ArrayList<>()).add(foundPath.get(i));
-                }
+                shortcutMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).addAll(entry.getValue());
             }
         }
         return shortcutMap;
