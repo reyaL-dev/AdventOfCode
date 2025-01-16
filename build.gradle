@@ -1,0 +1,35 @@
+plugins {
+    id 'application'
+}
+
+allprojects {
+    apply(plugin: 'java')
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testImplementation platform('org.junit:junit-bom:5.10.0')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+    }
+
+    tasks.named('test', Test) {
+        useJUnitPlatform()
+    }
+}
+
+group = 'com.reyaldev.aoc'
+version = '1.0-SNAPSHOT'
+
+application {
+    mainClass = 'com.reyaldev.aoc.main.AoCMain'
+}
+
+dependencies {
+    implementation project(':downloader')
+}
+
+test {
+    useJUnitPlatform()
+}
