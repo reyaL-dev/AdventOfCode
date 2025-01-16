@@ -3,8 +3,8 @@ public class AoCMain
 
     public static void main(String[] args) throws Exception
     {
-        /*Day20PartOne DayHandler = new Day20PartOne("C:\\Project\\inputfiles\\input20");*/
-        Day20PartTwo DayHandler = new Day20PartTwo("C:\\Project\\inputfiles\\input20");
+        /*Day16PartOne DayHandler = new Day16PartOne("C:\\Project\\inputfiles\\input16");*/
+        Day16PartTwo DayHandler = new Day16PartTwo("C:\\Project\\inputfiles\\input16TEST");
         System.out.println(DayHandler.getSolutionString(""));
     }
 
