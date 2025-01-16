@@ -12,6 +12,17 @@ public class Day01 extends AbstractDay
     private List<Integer> firstList = new ArrayList<>();
     private List<Integer> secondList = new ArrayList<>();
 
+    Day01(int dayNumber)
+    {
+        super(dayNumber);
+    }
+
+    Day01(String input, int dayNumber)
+    {
+        super(input, dayNumber);
+    }
+
+
     public Day01()
     {
         this(readInput(1));
