@@ -26,7 +26,6 @@ public class AoCMain
         days.forEach(daySupplier -> {
             Instant start = Instant.now();
             Day d = daySupplier.get();
-            System.out.println(getTitle(d));
             System.out.println(d.part1());
             Instant part1 = Instant.now();
             System.out.println(d.part2());
@@ -40,11 +39,6 @@ public class AoCMain
         System.out.println("Full execution time: " + Duration.between(bigStart, bigEnd).toMillis());
         System.out.println("   Sum of all times: " + durations.stream().reduce(Duration.ZERO, Duration::plus).toMillis());
 
-    }
-
-    private static String getTitle(Day day)
-    {
-        return day.toString();
     }
 
     public static String readInput(int dayNumber)
@@ -70,14 +64,5 @@ public class AoCMain
             System.exit(1);
         }
         new Downloader(sessionId, 2024, inputfileFolder).downloadInputs();
-    }
-
-    // INTERFACES
-    interface AoCHandler
-    {
-
-        Object read(String path) throws Exception;
-
-        String getSolutionString(String param) throws Exception;
     }
 }
